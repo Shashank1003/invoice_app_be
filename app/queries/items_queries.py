@@ -1,5 +1,6 @@
 from sqlalchemy import text
 from app.adapters.database import db_session
+from uuid import UUID
 
 class ItemsQuery:
   @staticmethod
@@ -12,7 +13,7 @@ class ItemsQuery:
     return all_items
   
   @staticmethod
-  def fetch_item_by_id(item_id):
+  def fetch_item_by_id(item_id: UUID):
     item = db_session.execute(
       text(
         """
@@ -23,3 +24,21 @@ class ItemsQuery:
       {"item_id": item_id }
     ).fetchone()
     return item
+  
+  @staticmethod
+  def create_item(name:str, quantity: int, price: float, total: float):
+    result = db_session.execute(
+      text(
+        """
+        INSERT INTO items (name, quantity, price, total)
+        VALUES (:name, :quantity, :price, :total)
+        RETURNING id, name, quantity, price, total 
+        """.strip()
+      ),
+      {"name": name,
+       "quantity": quantity,
+       "price": price,
+       "total": total}
+    ).fetchone()
+    db_session.commit()
+    return result
