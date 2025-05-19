@@ -42,3 +42,32 @@ class ItemsQuery:
     ).fetchone()
     db_session.commit()
     return result
+  
+  @staticmethod
+  def update_item(item_id: UUID,
+                  name: str,
+                  quantity: int,
+                  price: float,
+                  total: float
+                  ):
+    result= db_session.execute(
+      text(
+        """
+        UPDATE items
+        SET name=:name,
+        quantity=:quantity,
+        price=:price,
+        total=:total
+        WHERE id=:item_id
+        RETURNING id, name, quantity, price, total
+        """.strip()
+      ), {
+        "item_id": item_id,
+        "name": name,
+        "quantity": quantity,
+        "price": price,
+        "total": total
+      }
+    ).fetchone()
+    db_session.commit()
+    return result

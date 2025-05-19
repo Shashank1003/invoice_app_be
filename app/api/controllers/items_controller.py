@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Request
-from app.schemas.item_schema import ItemOutputSchema, ItemInputSchema
+from app.schemas.item_schema import ItemOutputSchema, ItemInputSchema, ItemUpdateSchema
 from typing import List
 from app.services.items_services import ItemsService
 from uuid import UUID
-from app.entities.items_entity import ItemsEntity
 
 import logging
 
@@ -46,4 +45,15 @@ async def create_item(request: ItemInputSchema):
   """To create a new item"""
   print(f"request: {request}")
   resp = ItemsService.create_item(request)
+  return resp
+
+
+@items_router.put(
+  path="/items/{item_id}",
+  summary="Update item",
+  description="Update an existing item",
+  response_model= ItemOutputSchema
+)
+async def update_item(item_id: UUID, request: ItemUpdateSchema):
+  resp = ItemsService.update_item(item_id, request)
   return resp

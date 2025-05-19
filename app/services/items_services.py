@@ -28,3 +28,17 @@ class ItemsService:
     if resp is None:
       raise Exception("Item creation failed")
     return ItemsEntity(*resp)
+  
+  @staticmethod
+  def update_item(item_id, request):
+    resp = ItemsQuery.update_item(item_id=item_id,
+                                  name=request.name,
+                                  quantity=request.quantity,
+                                  price=request.price,
+                                  total=request.total
+                                  )
+    if resp is None:
+      raise Exception("Item update failed")
+    return ItemsEntity(*resp)
+  
+  
