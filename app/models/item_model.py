@@ -1,4 +1,3 @@
-import uuid
 from sqlalchemy import Column, String, Integer, Float, text
 from sqlalchemy.dialects.postgresql import UUID
 from app.adapters.database import Base
