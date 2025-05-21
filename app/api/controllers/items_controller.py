@@ -3,6 +3,7 @@ from app.schemas.item_schema import ItemOutputSchema, ItemInputSchema, ItemUpdat
 from typing import List
 from app.services.items_services import ItemsService
 from uuid import UUID
+from app.common.exceptions import BadRequestError, ServerError
 
 import logging
 
@@ -56,4 +57,14 @@ async def create_item(request: ItemInputSchema):
 )
 async def update_item(item_id: UUID, request: ItemUpdateSchema):
   resp = ItemsService.update_item(item_id, request)
+  return resp
+
+
+@items_router.delete(
+  path="/items/{item_id}",
+  summary="Delete item",
+  description="Delete an existing item by id",
+)
+async def delete_item(item_id: UUID):
+  resp = ItemsService.delete_item(item_id)
   return resp

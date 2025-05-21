@@ -71,3 +71,15 @@ class ItemsQuery:
     ).fetchone()
     db_session.commit()
     return result
+  
+  @staticmethod
+  def delete_item(item_id: UUID):
+    db_session.execute(
+      text(
+        """
+        DELETE FROM items
+        WHERE id=:item_id
+        """.strip()
+      ), {"item_id": item_id}
+    )
+    db_session.commit()
