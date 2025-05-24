@@ -1,12 +1,12 @@
 from enum import Enum
 
 class StatusEnum(Enum):
-  DRAFT = "draft"
-  PENDING = "pending"
-  PAID = "paid"
+  DRAFT = "DRAFT"
+  PENDING = "PENDING"
+  PAID = "PAID"
   
 class PaymentTermsEnum(Enum):
-  ONE = "1_day"
-  SEVEN = "7_day"
-  FOURTEEN = "14_day"
-  THIRTY = "30_day"
+  ONE = "ONE"
+  SEVEN = "SEVEN"
+  FOURTEEN = "FOURTEEN"
+  THIRTY = "THIRTY"

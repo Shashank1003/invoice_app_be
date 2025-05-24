@@ -63,3 +63,15 @@ def seed_invoices(n=10):
     
 if __name__ == "__main__":
   seed_invoices(30)
+  
+# Run this query in PostgreSQL to set due_date
+"""
+UPDATE invoices
+SET due_date = CASE payment_terms
+    WHEN 'ONE' THEN invoice_date + INTERVAL '1 days'
+    WHEN 'SEVEN' THEN invoice_date + INTERVAL '7 days'
+    WHEN 'FOURTEEN' THEN invoice_date + INTERVAL '14 days'
+	WHEN 'THIRTY' THEN invoice_date + INTERVAL '30 days'
+    ELSE NULL
+END;
+"""
