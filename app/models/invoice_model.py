@@ -1,8 +1,11 @@
-from sqlalchemy import Column, String, text, Date
+from sqlalchemy import Column, String, text, Date, Float
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 from app.adapters.database import Base
 from ._utils import ResourceMixin
 import datetime
+from sqlalchemy.types import Enum
+from app.common.enums import StatusEnum, PaymentTermsEnum
 
 class Invoice(ResourceMixin, Base):
   __tablename__ = "invoices"
@@ -13,7 +16,9 @@ class Invoice(ResourceMixin, Base):
               unique=True,
               index=True,
               nullable=False)
-  due_date = Column(Date, unique=False, index=True, nullable=False)
+  #keeping due_date as nullable as it will be handled by BE
+  #We will receive due days in the form of payment terms
+  due_date = Column(Date, unique=False, index=True, nullable=True)
   client_name= Column(String, unique=False, nullable=False, index=True)
   client_email = Column(String, unique=False, nullable=False, index=True)
   street_from = Column(String, unique=False, nullable=False, index=False)
@@ -29,3 +34,9 @@ class Invoice(ResourceMixin, Base):
                     unique=False,
                     index=True,
                     nullable=False)
+  status = Column(Enum(StatusEnum), nullable=False, unique=False, index=True)
+  payment_terms = Column(Enum(PaymentTermsEnum), nullable=False, unique=False, index=True)
+  description= Column(String, unique=False, nullable=False, index=False)
+  total = Column(Float, unique=False, nullable=False, index=True)
+  
+  items = relationship("Item", back_populates="invoice", cascade="all, delete-orphan")
