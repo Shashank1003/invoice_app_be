@@ -17,3 +17,14 @@ async def get_invoices():
   """To get all the invoices"""
   invoices_list = InvoicesService().fetch_all_invoices()
   return invoices_list
+
+
+@invoices_router.get(
+  path="/invoices/{invoice_id}",
+  summary="invoices endpoint",
+  description="This endpoint returns a single item",
+  # response_model=InvoiceOutputSchema,
+)
+async def get_invoice(invoice_id: UUID):
+  invoice = InvoicesService().fetch_invoice_by_id(invoice_id)
+  return invoice
