@@ -72,3 +72,15 @@ class InvoiceEntity:
       if created_item:
         items_list.append(ItemsEntity(**created_item._mapping))
     return items_list
+  
+  @classmethod
+  def update_invoice(cls, request):
+    request.pop("items", None)
+    invoice = InvoicesQuery.update_invoice(**request)
+    if invoice:
+      return cls(**invoice._mapping)
+    
+  @classmethod
+  def delete_invoice_items(cls, invoice_id):
+    ItemsQuery.delete_invoice_items(invoice_id)
+    return True

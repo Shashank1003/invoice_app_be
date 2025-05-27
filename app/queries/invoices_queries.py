@@ -74,3 +74,44 @@ class InvoicesQuery:
     ).fetchone()
     # don't use db-commit here as running this action in transaction.
     return result
+  
+  @staticmethod
+  def update_invoice(due_date, client_name, total, status, street_from,
+                    street_to, city_from, city_to, country_from, country_to,
+                    postcode_from, postcode_to, client_email, invoice_date, 
+                    payment_terms, description, id):
+    status = status.value
+    payment_terms = payment_terms.value
+    result = db_session.execute(
+      text("""
+          UPDATE invoices SET due_date=:due_date, client_name=:client_name, 
+          total=:total, status=:status, street_from=:street_from, 
+          street_to=:street_to, city_from=:city_from, city_to=:city_to, 
+          country_from=:country_from, country_to=:country_to, postcode_from=:postcode_from, 
+          postcode_to=:postcode_to, client_email=:client_email, invoice_date=:invoice_date, 
+          payment_terms=:payment_terms, description=:description WHERE id = :id 
+          RETURNING due_date, client_name, total, status, street_from, street_to, city_from, 
+          city_to, country_from, country_to, postcode_from, postcode_to, client_email, 
+          invoice_date, payment_terms, description, id;
+          """.strip()),{
+            "due_date": due_date,
+            "client_name": client_name,
+            "total": total,
+            "status": status,
+            "street_from": street_from,
+            "street_to": street_to,
+            "city_from": city_from,
+            "city_to": city_to,
+            "country_from": country_from,
+            "country_to": country_to,
+            "postcode_from": postcode_from,
+            "postcode_to": postcode_to,
+            "client_email": client_email,
+            "invoice_date": invoice_date, 
+            "payment_terms": payment_terms,
+            "description": description,
+            "id": id
+            }
+    ).fetchone()
+    # don't use db-commit here as running this action in transaction.
+    return result

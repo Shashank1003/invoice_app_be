@@ -34,5 +34,6 @@ class InvoiceListSchema(BaseModel):
   client_name: str = Field(..., max_length=100)
   total: float = Field(..., gt=0)
   status: StatusEnum
-# class ItemUpdateSchema(ItemInputSchema):
-#   id: Optional[UUID] = Field(default=None, description="identifier for item (not required!)")
+  
+class InvoiceUpdateSchema(InvoiceInputSchema):
+  id: Optional[UUID] = Field(default=None, description="identifier for invoice (not required!)")
