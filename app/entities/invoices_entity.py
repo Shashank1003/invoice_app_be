@@ -84,3 +84,8 @@ class InvoiceEntity:
   def delete_invoice_items(cls, invoice_id):
     ItemsQuery.delete_invoice_items(invoice_id)
     return True
+  
+  @classmethod
+  def delete_invoice(cls, invoice_id):
+    InvoicesQuery.delete_invoice(invoice_id)
+    return True

@@ -52,4 +52,14 @@ async def update_invoice(invoice_id: UUID, request: InvoiceUpdateSchema):
   invoice_service = InvoicesService()
   updated_invoice = invoice_service.update_invoice(invoice_id=invoice_id,request=request)
   return updated_invoice
-                            
+  
+
+@invoices_router.delete(
+  path="/invoices/{invoice_id}",
+  summary="invoices endpoint",
+  description="This endpoint deletes a single invoice",
+)
+async def delete_invoice(invoice_id: UUID):
+  invoice_service = InvoicesService()
+  resp = invoice_service.delete_invoice(invoice_id=invoice_id)
+  return resp

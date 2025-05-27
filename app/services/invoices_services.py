@@ -60,3 +60,20 @@ class InvoicesService:
     except Exception as e:
       db_session.rollback()
       raise e
+    
+  def delete_invoice(self, invoice_id):
+    existing_invoice = InvoiceEntity.get_invoice_by_id(invoice_id=invoice_id)
+    if existing_invoice is None:
+      raise BadRequestError(status_code=404, detail=f"invoice with id {invoice_id} not found!")
+    
+    if db_session.in_transaction():
+      db_session.rollback()
+    try:
+      with db_session.begin():
+        InvoiceEntity.delete_invoice_items(invoice_id=invoice_id)
+        InvoiceEntity.delete_invoice(invoice_id=invoice_id)
+        return True
+    except Exception as e:
+      db_session.rollback()
+      raise e
+      

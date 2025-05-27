@@ -115,3 +115,15 @@ class InvoicesQuery:
     ).fetchone()
     # don't use db-commit here as running this action in transaction.
     return result
+  
+  @staticmethod
+  def delete_invoice(invoice_id):
+    db_session.execute(
+      text(
+        """
+        DELETE FROM invoices WHERE id=:invoice_id
+        """.strip()
+      ),{"invoice_id": invoice_id}
+    )
+    # don't use db-commit here as running this action in transaction.
+    return True
