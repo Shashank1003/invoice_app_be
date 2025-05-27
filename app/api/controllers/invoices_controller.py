@@ -22,9 +22,23 @@ async def get_invoices():
 @invoices_router.get(
   path="/invoices/{invoice_id}",
   summary="invoices endpoint",
-  description="This endpoint returns a single item",
-  # response_model=InvoiceOutputSchema,
+  description="This endpoint returns a single invoice",
+  response_model=InvoiceOutputSchema,
 )
 async def get_invoice(invoice_id: UUID):
   invoice = InvoicesService().fetch_invoice_by_id(invoice_id)
+  return invoice
+
+
+@invoices_router.post(
+  path="/invoices",
+  summary="invoices endpoint",
+  description="This endpoint creates a new invoice",
+  response_model=InvoiceOutputSchema,
+)
+async def create_invoice( request: InvoiceInputSchema):
+  invoice = InvoicesService(invoice_date=request.invoice_date,
+                            payment_terms=request.payment_terms,
+                            items=request.items
+                            ).create_invoice(request)
   return invoice

@@ -26,19 +26,20 @@ class ItemsQuery:
     return item
   
   @staticmethod
-  def create_item(name:str, quantity: int, price: float, total: float):
+  def create_item(name:str, quantity: int, price: float, total: float, invoice_id: UUID):
     result = db_session.execute(
       text(
         """
-        INSERT INTO items (name, quantity, price, total)
-        VALUES (:name, :quantity, :price, :total)
-        RETURNING id, name, quantity, price, total 
+        INSERT INTO items (name, quantity, price, total, invoice_id)
+        VALUES (:name, :quantity, :price, :total, :invoice_id)
+        RETURNING id, name, quantity, price, total, invoice_id 
         """.strip()
       ),
       {"name": name,
-       "quantity": quantity,
-       "price": price,
-       "total": total}
+      "quantity": quantity,
+      "price": price,
+      "total": total,
+      "invoice_id": invoice_id}
     ).fetchone()
     db_session.commit()
     return result
@@ -94,4 +95,23 @@ class ItemsQuery:
         """.strip()
         ), {"invoice_id": invoice_id}
       ).fetchall()
+    return result
+  
+  @staticmethod
+  def create_invoice_item(name:str, quantity: int, price: float, total: float, invoice_id: UUID):
+    result = db_session.execute(
+      text(
+        """
+        INSERT INTO items (name, quantity, price, total, invoice_id)
+        VALUES (:name, :quantity, :price, :total, :invoice_id)
+        RETURNING id, name, quantity, price, total 
+        """.strip()
+      ),
+      {"name": name,
+      "quantity": quantity,
+      "price": price,
+      "total": total,
+      "invoice_id": invoice_id}
+    ).fetchone()
+    # don't use db-commit here as running this action in transaction.
     return result

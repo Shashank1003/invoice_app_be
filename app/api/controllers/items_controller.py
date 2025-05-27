@@ -44,7 +44,6 @@ async def get_item(item_id: UUID) :
 )
 async def create_item(request: ItemInputSchema):
   """To create a new item"""
-  print(f"request: {request}")
   resp = ItemsService.create_item(request)
   return resp
 

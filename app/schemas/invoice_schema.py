@@ -6,7 +6,7 @@ from app.common.enums import StatusEnum, PaymentTermsEnum
 from app.schemas.item_schema import ItemInputSchema
 
 class InvoiceInputSchema(BaseModel):
-  due_date: Optional[date] 
+  due_date: Optional[date] = None
   client_name: str= Field(..., max_length=100)
   client_email: str = Field(..., max_length=100)
   street_from: str = Field(...)
@@ -21,8 +21,9 @@ class InvoiceInputSchema(BaseModel):
   status: StatusEnum
   payment_terms: PaymentTermsEnum
   description: str = Field(...)
-  total: float = Field(..., gt=0)
+  total: Optional[float] = Field( gt=0, default=None)
   items: List[ItemInputSchema]
+  # Keeping due_date and total as optional as their value will be calculated by BE itself
   
 class InvoiceOutputSchema(InvoiceInputSchema):
   id: UUID = Field(..., description="identifier for item")
