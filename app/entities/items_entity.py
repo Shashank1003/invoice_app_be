@@ -9,3 +9,12 @@ class ItemsEntity:
     quantity: int
     price: float
     total: float
+
+@dataclass
+class ItemsEntityInvoice:
+    id: UUID
+    name: str
+    quantity: int
+    price: float
+    total: float
+    invoice_id: UUID

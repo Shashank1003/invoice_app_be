@@ -18,3 +18,11 @@ class ItemUpdateSchema(ItemInputSchema):
     id: Optional[UUID] = Field(
         default=None, description="identifier for item (not required!)"
     )
+
+
+class ItemInvoiceInputSchema(ItemInputSchema):
+    invoice_id: UUID = Field(..., description="identifier for invoice")
+
+
+class ItemInvoiceOutputSchema(ItemInvoiceInputSchema):
+    id: Optional[UUID] = Field(default=None, description="identifier for item")

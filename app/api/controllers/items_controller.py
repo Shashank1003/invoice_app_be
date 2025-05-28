@@ -1,5 +1,11 @@
 from fastapi import APIRouter
-from app.schemas.item_schema import ItemOutputSchema, ItemInputSchema, ItemUpdateSchema
+from app.schemas.item_schema import (
+    ItemOutputSchema,
+    ItemInputSchema,
+    ItemUpdateSchema,
+    ItemInvoiceInputSchema,
+    ItemInvoiceOutputSchema,
+)
 from typing import List
 from app.services.items_services import ItemsService
 from uuid import UUID
@@ -40,9 +46,9 @@ async def get_item(item_id: UUID):
     path="/items",
     summary="Create item",
     description="Create a new item",
-    response_model=ItemOutputSchema,
+    response_model=ItemInvoiceOutputSchema,
 )
-async def create_item(request: ItemInputSchema):
+async def create_item(request: ItemInvoiceInputSchema):
     """To create a new item"""
     resp = ItemsService.create_item(request)
     return resp

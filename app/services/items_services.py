@@ -1,4 +1,4 @@
-from app.entities.items_entity import ItemsEntity
+from app.entities.items_entity import ItemsEntity, ItemsEntityInvoice
 from app.queries.items_queries import ItemsQuery
 from app.common.exceptions import BadRequestError, ServerError
 
@@ -19,14 +19,14 @@ class ItemsService:
     def fetch_item_by_id(item_id):
         item = ItemsQuery.fetch_item_by_id(item_id)
         if item:
-            return ItemsEntity(*item)
+            return ItemsEntity(**item._mapping)
         raise BadRequestError(status_code=404, detail="item not found!")
 
     @staticmethod
     def create_item(request):
         resp = ItemsQuery.create_item(**request.model_dump())
         if resp:
-            return ItemsEntity(*resp)
+            return ItemsEntityInvoice(**resp._mapping)
         raise ServerError()
 
     @staticmethod
