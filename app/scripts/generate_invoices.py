@@ -9,6 +9,7 @@ from app.common.enums import StatusEnum, PaymentTermsEnum
 
 faker = Faker()
 
+
 def generate_fake_invoice():
     invoice = Invoice(
         id=uuid4(),
@@ -30,40 +31,41 @@ def generate_fake_invoice():
         total=0.0,  # will be updated after item creation
     )
     total_sum = 0
-    for i in range(random.randint(1,10)):
-      quantity= random.randint(1, 100)
-      price = round(random.uniform(10.0, 500.0), 2)
-      total = round(quantity * price, 2)
-      item = Item(
-        id= uuid4(),
-        name = faker.word(),
-        quantity= quantity,
-        price = price,
-        total = total,
-        # invoice_id = invoice.id -- handled automatically by sqlAlchemy
-      )
-      total_sum = total_sum + total
-      invoice.items.append(item)
-      
+    for i in range(random.randint(1, 10)):
+        quantity = random.randint(1, 100)
+        price = round(random.uniform(10.0, 500.0), 2)
+        total = round(quantity * price, 2)
+        item = Item(
+            id=uuid4(),
+            name=faker.word(),
+            quantity=quantity,
+            price=price,
+            total=total,
+            # invoice_id = invoice.id -- handled automatically by sqlAlchemy
+        )
+        total_sum = total_sum + total
+        invoice.items.append(item)
+
     invoice.total = round(total_sum, 2)  # type: ignore
     return invoice
-      
+
 
 def seed_invoices(n=10):
-  try:
-    for i in range(n):
-      db_session.add(generate_fake_invoice())
-    db_session.commit()
-    print(f"seeded {n} invoices successfully!")
-  except Exception as e:
-    db_session.rollback()
-    print(f"error in seeding invoices. {e}")
-  finally:
-    db_session.close()
-    
+    try:
+        for i in range(n):
+            db_session.add(generate_fake_invoice())
+        db_session.commit()
+        print(f"seeded {n} invoices successfully!")
+    except Exception as e:
+        db_session.rollback()
+        print(f"error in seeding invoices. {e}")
+    finally:
+        db_session.close()
+
+
 if __name__ == "__main__":
-  seed_invoices(30)
-  
+    seed_invoices(30)
+
 # Run this query in PostgreSQL to set due_date
 """
 UPDATE invoices

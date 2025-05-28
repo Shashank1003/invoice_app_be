@@ -3,6 +3,7 @@ Here you will find the core models and abstract functions
 which will be acting as a abstract base extract class, following the
 Model Inheritance
 """
+
 from typing import Any, Dict, List
 
 from sqlalchemy import Boolean, Column, DateTime, func, true

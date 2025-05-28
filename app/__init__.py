@@ -6,7 +6,12 @@ from fastapi import FastAPI
 # from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
 from app.api.routes import api_router
-from app.common.exceptions import ServerError, BadRequestError, server_error_handler, bad_request_handler
+from app.common.exceptions import (
+    ServerError,
+    BadRequestError,
+    server_error_handler,
+    bad_request_handler,
+)
 
 # from app.extensions import configure_sentry_extensions
 # from app.middlewares.authorization_middleware import AuthorizationMiddleware
@@ -17,6 +22,7 @@ from app.common.exceptions import ServerError, BadRequestError, server_error_han
 # logging.basicConfig(level=logging.DEBUG)
 # sqlalchemy_logger = logging.getLogger("sqlalchemy.engine")
 # sqlalchemy_logger.setLevel(logging.DEBUG)
+
 
 def register_endpoints() -> FastAPI:
     """

@@ -15,7 +15,9 @@ db_hostname = os.getenv("DATABASE_HOSTNAME")
 db_port = os.getenv("DATABASE_PORT")
 db_name = os.getenv("DATABASE_NAME")
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}"
+SQLALCHEMY_DATABASE_URL = (
+    f"postgresql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}"
+)
 
 DATABASE_ENGINE = create_engine(SQLALCHEMY_DATABASE_URL)
 
@@ -31,7 +33,9 @@ class SQLAlchemyConnector:
 
     def __init__(self, engine=DATABASE_ENGINE):
         self.engine = engine
-        self.session_factory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        self.session_factory = sessionmaker(
+            autocommit=False, autoflush=False, bind=engine
+        )
         self.SessionLocal = scoped_session(session_factory=self.session_factory)
         self.db_session_var = ContextVar("db_session")
         self.base = declarative_base()
