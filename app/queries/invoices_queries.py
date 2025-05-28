@@ -30,6 +30,47 @@ class InvoicesQuery:
     ).fetchone()
     return result
   
+  @staticmethod
+  def fetch_invoice(invoice_id: UUID):
+    result = db_session.execute(
+      text("""
+        SELECT 
+            i.id,
+            i.due_date,
+            i.client_name,
+            i.total,
+            i.status,
+            i.street_from,
+            i.street_to,
+            i.city_from,
+            i.city_to,
+            i.country_from,
+            i.country_to,
+            i.postcode_from,
+            i.postcode_to,
+            i.client_email,
+            i.invoice_date,
+            i.payment_terms,
+            i.description,
+            COALESCE(json_agg(
+                json_build_object(
+                    'id', it.id,
+                    'invoice_id', it.invoice_id,
+                    'name', it.name,
+                    'quantity', it.quantity,
+                    'price', it.price,
+                    'total', it.total
+                )
+            ) FILTER (WHERE it.id IS NOT NULL), '[]') AS items
+        FROM invoices i
+        LEFT JOIN items it ON i.id = it.invoice_id
+        WHERE i.id = :invoice_id
+        GROUP BY i.id
+    """.strip()
+    ), {"invoice_id": invoice_id}
+    ).fetchone()
+    return result
+  
   
   @staticmethod
   def create_invoice(due_date, client_name, total, status, street_from,

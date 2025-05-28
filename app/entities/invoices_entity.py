@@ -52,10 +52,10 @@ class InvoiceEntity:
       return cls(**invoice._mapping)
   
   @classmethod
-  def get_invoice_items(cls, invoice_id: UUID):
-    items = ItemsQuery.fetch_invoice_items(invoice_id)
-    if items:
-      return [ItemsEntity(**item._mapping) for item in items]
+  def get_invoice(cls, invoice_id: UUID):
+    invoice = InvoicesQuery.fetch_invoice(invoice_id)
+    if invoice:
+      return cls(**invoice._mapping)
   
   @classmethod
   def create_invoice(cls,request):

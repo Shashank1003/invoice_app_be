@@ -84,18 +84,6 @@ class ItemsQuery:
       ), {"item_id": item_id}
     )
     db_session.commit()
-    
-  @staticmethod
-  def fetch_invoice_items(invoice_id: UUID):
-    result = db_session.execute(
-      text(
-        """
-        SELECT id, name, quantity, price, total FROM items 
-        WHERE invoice_id=:invoice_id; 
-        """.strip()
-        ), {"invoice_id": invoice_id}
-      ).fetchall()
-    return result
   
   @staticmethod
   def create_invoice_item(name:str, quantity: int, price: float, total: float, invoice_id: UUID):
