@@ -135,7 +135,3 @@ A simple and efficient invoice management system built with **FastAPI**. This ap
 Shashank Gupta – @Shashank1003 | <guptashashank8975@gmail.com>
 
 ---
-
-```
-
-```
