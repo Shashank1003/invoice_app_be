@@ -10,23 +10,26 @@ services:
       - .:/app
     env_file:
       - .env
-    depends_on:
-      - db
+#     depends_on:
+#       - db
 
-  db:
-    image: postgres:15
-    container_name: invoice_db
-    restart: always
-    environment:
-      DATABASE_HOSTNAME: ${DATABASE_HOSTNAME}
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
-      DATABASE_PORT: ${DATABASE_PORT}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+# Add db-config if you are using local Postgres database
+# No need when connected to an external database source
 
-volumes:
-  pgdata:
+#   db:
+#     image: postgres:15
+#     container_name: invoice_app
+#     restart: always
+#     environment:
+#       DATABASE_HOSTNAME: ${DATABASE_HOSTNAME}
+#       POSTGRES_USER: ${DATABASE_USERNAME}
+#       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+#       POSTGRES_DB: ${DATABASE_NAME}
+#       DATABASE_PORT: ${DATABASE_PORT}
+#     volumes:
+#       - pgdata:/var/lib/postgresql/data
+#     ports:
+#       - "5432:5432"
+
+# volumes:
+#   pgdata:
