@@ -18,7 +18,7 @@ db_query = os.getenv("DATABASE_QUERY_PARAM")
 
 SQLALCHEMY_DATABASE_URL = f"postgresql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}?{db_query}"
 
-DATABASE_ENGINE = create_engine(SQLALCHEMY_DATABASE_URL)
+DATABASE_ENGINE = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
 
 
 class SQLAlchemyConnector:
