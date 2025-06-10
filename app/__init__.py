@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import api_router
 from app.common.exceptions import (
@@ -13,6 +14,10 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 sqlalchemy_logger = logging.getLogger("sqlalchemy.engine")
 sqlalchemy_logger.setLevel(logging.DEBUG)
+
+origins = [
+    "http://localhost:3000",
+]
 
 
 def create_app(**kwargs) -> FastAPI:
@@ -29,5 +34,11 @@ def create_app(**kwargs) -> FastAPI:
 
     app.add_exception_handler(ServerError, server_error_handler)
     app.add_exception_handler(BadRequestError, bad_request_handler)
-
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,  # or use ["*"] to allow all origins
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     return app
