@@ -1,13 +1,18 @@
 from dataclasses import dataclass, field
-from uuid import UUID
 from datetime import date
-from app.common.enums import StatusEnum, PaymentTermsEnum
-from app.queries.invoices_queries import InvoicesQuery
-from app.entities.items_entity import ItemsEntity
-from typing import List
-from app.queries.items_queries import ItemsQuery
-from typing import Optional
+from typing import Any, Dict, List, Optional
+from uuid import UUID
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.common.enums import PaymentTermsEnum, StatusEnum
 from app.common.exceptions import BadRequestError, ServerError
+from app.entities.items_entity import ItemsEntity
+from app.queries.invoices_queries import InvoicesQuery
+from app.queries.items_queries import ItemsQuery
+from app.schemas.item_schema import ItemInputSchema
+
+# from fastapi import HTTPException
 
 
 @dataclass
@@ -19,8 +24,8 @@ class InvoiceListEntity:
     status: StatusEnum
 
     @classmethod
-    def get_all_invoices(cls):
-        invoices = InvoicesQuery.fetch_all_invoices()
+    async def get_all_invoices(cls, db: AsyncSession) -> List["InvoiceListEntity"]:
+        invoices = await InvoicesQuery.fetch_all_invoices(db)
         return [cls(**invoice._mapping) for invoice in invoices]
 
     # info: use cls(**invoice._mapping) instead of cls(*invoice)
@@ -50,33 +55,40 @@ class InvoiceEntity:
     id: Optional[UUID] = None
 
     @classmethod
-    def get_invoice_by_id(cls, invoice_id: UUID):
-        invoice = InvoicesQuery.fetch_invoice_by_id(invoice_id)
+    async def get_invoice_by_id(
+        cls, db: AsyncSession, invoice_id: UUID
+    ) -> "InvoiceEntity":
+        invoice = await InvoicesQuery.fetch_invoice_by_id(db=db, invoice_id=invoice_id)
         if invoice:
             return cls(**invoice._mapping)
         raise BadRequestError(detail="Invoice not found", status_code=404)
 
     @classmethod
-    def get_invoice(cls, invoice_id: UUID):
-        invoice = InvoicesQuery.fetch_invoice(invoice_id)
+    async def get_invoice(cls, db: AsyncSession, invoice_id: UUID) -> "InvoiceEntity":
+        invoice = await InvoicesQuery.fetch_invoice(invoice_id=invoice_id, db=db)
         if invoice:
             return cls(**invoice._mapping)
         raise BadRequestError(detail="Invoice not found", status_code=404)
 
     @classmethod
-    def create_invoice(cls, request):
+    async def create_invoice(
+        cls, db: AsyncSession, request: Dict[str, Any]
+    ) -> "InvoiceEntity":
         request.pop("items", None)
-        invoice = InvoicesQuery.create_invoice(**request)
+
+        invoice = await InvoicesQuery.create_invoice(**request, db=db)
         if invoice:
             return cls(**invoice._mapping)
         raise ServerError()
 
     @classmethod
-    def create_invoice_items(cls, items, invoice_id):
+    async def create_invoice_items(
+        cls, items: List[ItemInputSchema], invoice_id: UUID, db: AsyncSession
+    ) -> List[ItemsEntity]:
         items_list = []
         for item in items:
-            created_item = ItemsQuery.create_invoice_item(
-                **item.dict(), invoice_id=invoice_id
+            created_item = await ItemsQuery.create_invoice_item(
+                **item.dict(), invoice_id=invoice_id, db=db
             )
             if created_item:
                 items_list.append(ItemsEntity(**created_item._mapping))
@@ -85,19 +97,21 @@ class InvoiceEntity:
         return items_list
 
     @classmethod
-    def update_invoice(cls, request):
+    async def update_invoice(
+        cls, db: AsyncSession, request: Dict[str, Any]
+    ) -> "InvoiceEntity":
         request.pop("items", None)
-        invoice = InvoicesQuery.update_invoice(**request)
+        invoice = await InvoicesQuery.update_invoice(**request, db=db)
         if invoice:
             return cls(**invoice._mapping)
         raise ServerError()
 
     @classmethod
-    def delete_invoice_items(cls, invoice_id):
-        ItemsQuery.delete_invoice_items(invoice_id)
+    async def delete_invoice_items(cls, invoice_id: UUID, db: AsyncSession) -> bool:
+        await ItemsQuery.delete_invoice_items(invoice_id=invoice_id, db=db)
         return True
 
     @classmethod
-    def delete_invoice(cls, invoice_id):
-        InvoicesQuery.delete_invoice(invoice_id)
+    async def delete_invoice(cls, db: AsyncSession, invoice_id: UUID) -> bool:
+        await InvoicesQuery.delete_invoice(invoice_id=invoice_id, db=db)
         return True

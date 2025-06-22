@@ -1,11 +1,12 @@
 from datetime import date, timedelta
-from app.common.enums import PaymentTermsEnum
 from typing import List
+
+from app.common.enums import PaymentTermsEnum
 
 
 class Utils:
     @staticmethod
-    def generate_due_date(invoice_date, payment_terms: PaymentTermsEnum):
+    def generate_due_date(invoice_date: date, payment_terms: PaymentTermsEnum) -> date:
         # Calculate the due date based on the payment terms
         if payment_terms == PaymentTermsEnum.ONE:
             return invoice_date + timedelta(days=1)
@@ -17,7 +18,7 @@ class Utils:
             return invoice_date + timedelta(days=30)
 
     @staticmethod
-    def calculate_total(items: List):
+    def calculate_total(items: List) -> float:
         # Calculate the total cost of the items
         total = 0
         for item in items:

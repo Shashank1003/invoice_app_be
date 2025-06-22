@@ -10,6 +10,7 @@ class ItemsEntity:
     price: float
     total: float
 
+
 @dataclass
 class ItemsEntityInvoice:
     id: UUID

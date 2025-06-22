@@ -1,11 +1,14 @@
-from sqlalchemy import Column, String, text, Date, Float
+import datetime
+
+from sqlalchemy import Column, Date, Float, String, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from app.adapters.database import Base
-from ._utils import ResourceMixin
-import datetime
 from sqlalchemy.types import Enum
-from app.common.enums import StatusEnum, PaymentTermsEnum
+
+from app.adapters.database.core import Base
+from app.common.enums import PaymentTermsEnum, StatusEnum
+
+from ._utils import ResourceMixin
 
 
 class Invoice(ResourceMixin, Base):

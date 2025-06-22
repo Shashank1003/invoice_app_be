@@ -1,8 +1,10 @@
-from sqlalchemy import Column, String, Integer, Float, text, ForeignKey
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, text
 from sqlalchemy.dialects.postgresql import UUID
-from app.adapters.database import Base
-from ._utils import ResourceMixin
 from sqlalchemy.orm import relationship
+
+from app.adapters.database.core import Base
+
+from ._utils import ResourceMixin
 
 
 class Item(ResourceMixin, Base):
