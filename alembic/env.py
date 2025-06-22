@@ -1,19 +1,19 @@
+import os
+import sys
 from logging.config import fileConfig
 
-from sqlalchemy import pool, create_engine
-
-from alembic import context
-from app.models import *
-from app import create_app
-import os
 from dotenv import load_dotenv
-from app.adapters.database import Base
-import sys
+from sqlalchemy import create_engine, pool
+
+from alembic import context  # type: ignore[attr-defined]
+from app import create_app
+from app.adapters.database.core import Base
+from app.models import *  # noqa: F401,F403
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-load_dotenv()
+load_dotenv(dotenv_path=".env", override=True)
 
 
 # Interpret the config file for Python logging.
@@ -40,6 +40,8 @@ DB_QUERY = os.getenv("DATABASE_QUERY_PARAM")
 
 DATABASE_URL = (
     f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}?{DB_QUERY}"
+    if DB_QUERY
+    else f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

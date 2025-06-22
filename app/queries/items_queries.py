@@ -1,39 +1,47 @@
-from sqlalchemy import text
-from app.adapters.database import db_session
+from typing import Optional, Sequence
 from uuid import UUID
+
+from sqlalchemy import text
+from sqlalchemy.engine import Row
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class ItemsQuery:
     @staticmethod
-    def fetch_all_items():
-        all_items = db_session.execute(
+    async def fetch_all_items(db: AsyncSession) -> Sequence[Row]:
+        all_items = await db.execute(
             text("""SELECT id, name, quantity, price, total FROM items""".strip())
-        ).fetchall()
-        return all_items
+        )
+        return all_items.fetchall()
 
     @staticmethod
-    def fetch_item_by_id(item_id: UUID):
-        item = db_session.execute(
+    async def fetch_item_by_id(db: AsyncSession, item_id: UUID) -> Optional[Row]:
+        item = await db.execute(
             text(
                 """
-        SELECT id, name, quantity, price, total FROM items 
+        SELECT id, name, quantity, price, total FROM items
         WHERE id=:item_id
         """.strip()
             ),
             {"item_id": item_id},
-        ).fetchone()
-        return item
+        )
+        return item.fetchone()
 
     @staticmethod
-    def create_item(
-        name: str, quantity: int, price: float, total: float, invoice_id: UUID
-    ):
-        result = db_session.execute(
+    async def create_item(
+        db: AsyncSession,
+        name: str,
+        quantity: int,
+        price: float,
+        total: float,
+        invoice_id: UUID,
+    ) -> Optional[Row]:
+        result = await db.execute(
             text(
                 """
         INSERT INTO items (name, quantity, price, total, invoice_id)
         VALUES (:name, :quantity, :price, :total, :invoice_id)
-        RETURNING id, name, quantity, price, total, invoice_id 
+        RETURNING id, name, quantity, price, total, invoice_id
         """.strip()
             ),
             {
@@ -43,15 +51,19 @@ class ItemsQuery:
                 "total": total,
                 "invoice_id": invoice_id,
             },
-        ).fetchone()
-        db_session.commit()
-        return result
+        )
+        return result.fetchone()
 
     @staticmethod
-    def update_item(
-        item_id: UUID, name: str, quantity: int, price: float, total: float
-    ):
-        result = db_session.execute(
+    async def update_item(
+        db: AsyncSession,
+        item_id: UUID,
+        name: str,
+        quantity: int,
+        price: float,
+        total: float,
+    ) -> Optional[Row]:
+        result = await db.execute(
             text(
                 """
         UPDATE items
@@ -70,13 +82,12 @@ class ItemsQuery:
                 "price": price,
                 "total": total,
             },
-        ).fetchone()
-        db_session.commit()
-        return result
+        )
+        return result.fetchone()
 
     @staticmethod
-    def delete_item(item_id: UUID):
-        db_session.execute(
+    async def delete_item(db: AsyncSession, item_id: UUID) -> bool:
+        await db.execute(
             text(
                 """
         DELETE FROM items
@@ -85,18 +96,23 @@ class ItemsQuery:
             ),
             {"item_id": item_id},
         )
-        db_session.commit()
+        return True
 
     @staticmethod
-    def create_invoice_item(
-        name: str, quantity: int, price: float, total: float, invoice_id: UUID
-    ):
-        result = db_session.execute(
+    async def create_invoice_item(
+        db: AsyncSession,
+        name: str,
+        quantity: int,
+        price: float,
+        total: float,
+        invoice_id: UUID,
+    ) -> Optional[Row]:
+        result = await db.execute(
             text(
                 """
         INSERT INTO items (name, quantity, price, total, invoice_id)
         VALUES (:name, :quantity, :price, :total, :invoice_id)
-        RETURNING id, name, quantity, price, total 
+        RETURNING id, name, quantity, price, total
         """.strip()
             ),
             {
@@ -106,20 +122,18 @@ class ItemsQuery:
                 "total": total,
                 "invoice_id": invoice_id,
             },
-        ).fetchone()
-        # don't use db-commit here as running this action in transaction.
-        return result
+        )
+        return result.fetchone()
 
     @staticmethod
-    def delete_invoice_items(invoice_id):
-        result = db_session.execute(
+    async def delete_invoice_items(db: AsyncSession, invoice_id: UUID) -> bool:
+        await db.execute(
             text(
                 """
-      DELETE FROM items 
-      WHERE invoice_id=:invoice_id
-      """.strip()
+                DELETE FROM items
+                WHERE invoice_id=:invoice_id
+                """.strip()
             ),
             {"invoice_id": invoice_id},
         )
-        return result
-        # don't commit as this query is being used inside a transaction
+        return True

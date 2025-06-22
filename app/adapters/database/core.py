@@ -1,62 +1,32 @@
-from contextvars import ContextVar
-
-from sqlalchemy import create_engine
-from sqlalchemy.exc import InternalError, OperationalError
-from sqlalchemy.orm import declarative_base, scoped_session, sessionmaker
-
+# database/core.py
 import os
+
 from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import declarative_base
 
-load_dotenv()  # Load from .env
+load_dotenv(dotenv_path=".env", override=True)
 
-db_username = os.getenv("DATABASE_USERNAME")
-db_password = os.getenv("DATABASE_PASSWORD")
-db_hostname = os.getenv("DATABASE_HOSTNAME")
-db_port = os.getenv("DATABASE_PORT")
-db_name = os.getenv("DATABASE_NAME")
-db_query = os.getenv("DATABASE_QUERY_PARAM")
+DB_USER = os.getenv("DATABASE_USERNAME")
+DB_PASS = os.getenv("DATABASE_PASSWORD")
+DB_HOST = os.getenv("DATABASE_HOSTNAME")
+DB_PORT = os.getenv("DATABASE_PORT")
+DB_NAME = os.getenv("DATABASE_NAME")
+DB_QUERY = os.getenv("DATABASE_QUERY_PARAM")
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}?{db_query}"
+ASYNC_DB_URL = (
+    f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}?{DB_QUERY}"
+    if DB_QUERY
+    else f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+)
 
-DATABASE_ENGINE = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
+# single shared async engine
+engine = create_async_engine(ASYNC_DB_URL, pool_pre_ping=True)
 
+# async session maker – each call returns a NEW AsyncSession
+AsyncSessionLocal: async_sessionmaker[AsyncSession] = async_sessionmaker(
+    bind=engine, expire_on_commit=False, autoflush=False, autocommit=False
+)
 
-class SQLAlchemyConnector:
-    """Central place to manage database connections, with context manager in place for below reasons:
-    1. Explicit Control:  explicitly set and get the session within a specific context
-    2. compatibility with async framework: single thread may handle multiple concurrent requests.
-
-    Wanted to avoid the with operator and replace code everywhere, hence a shortcut.
-    It may seem redundant as it is getting intialized everytime . But still a central place to manage.
-    """
-
-    def __init__(self, engine=DATABASE_ENGINE):
-        self.engine = engine
-        self.session_factory = sessionmaker(
-            autocommit=False, autoflush=False, bind=engine
-        )
-        self.SessionLocal = scoped_session(session_factory=self.session_factory)
-        self.db_session_var = ContextVar("db_session")
-        self.base = declarative_base()
-
-    def get_db_session(self):
-        try:
-            db_session = self.SessionLocal()
-            self.db_session_var.set(db_session)
-        except (InternalError, OperationalError):
-            self.SessionLocal.remove()
-            db_session = self.SessionLocal()
-            self.db_session_var.set(db_session)
-        return db_session
-
-    def get_current_db_session(self):
-        return self.db_session_var.get()
-
-    # noinspection PyUnresolvedReferences
-    def create_all(self, engine=None):
-        if engine is None:
-            engine = self.engine
-        self.base.metadata.create_all(bind=engine)
-
-    def get_base(self):
-        return self.base
+# declarative base class
+Base = declarative_base()

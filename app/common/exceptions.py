@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
-from fastapi import Request, status
-from fastapi.exceptions import HTTPException, RequestValidationError
+from fastapi import Request
+from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 
 
@@ -13,12 +13,12 @@ class ServerError(Exception):
 
 
 @dataclass
-class BadRequestError(RequestValidationError):
+class BadRequestError(HTTPException):
     status_code: int
     detail: Any
 
 
-async def server_error_handler(request: Request, exc) -> JSONResponse:
+async def server_error_handler(request: Request, exc: Any) -> JSONResponse:
     """
     5xx Server Error Handler
     :param request: Incoming Api request
@@ -33,7 +33,7 @@ async def server_error_handler(request: Request, exc) -> JSONResponse:
     )
 
 
-async def bad_request_handler(request: Request, exc) -> JSONResponse:
+async def bad_request_handler(request: Request, exc: Any) -> JSONResponse:
     """
     4xx Bad Request Handler Server Error Handler
     :param request: Incoming Api request

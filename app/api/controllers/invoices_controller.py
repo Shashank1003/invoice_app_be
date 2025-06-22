@@ -1,9 +1,15 @@
-from fastapi import APIRouter, Request
+from dataclasses import asdict
 from typing import List
 from uuid import UUID
+
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.adapters.database.dependencies import get_db
+from app.common.exceptions import BadRequestError
 from app.schemas.invoice_schema import (
-    InvoiceListSchema,
     InvoiceInputSchema,
+    InvoiceListSchema,
     InvoiceOutputSchema,
     InvoiceUpdateSchema,
 )
@@ -18,10 +24,11 @@ invoices_router = APIRouter()
     description="This endpoint returns a list of items",
     response_model=List[InvoiceListSchema],
 )
-async def get_invoices():
+async def get_invoices(db: AsyncSession = Depends(get_db)) -> List[InvoiceListSchema]:
     """To get all the invoices"""
-    invoices_list = InvoicesService().fetch_all_invoices()
-    return invoices_list
+    invoice_service = InvoicesService()
+    invoices_list = await invoice_service.fetch_all_invoices(db)
+    return [InvoiceListSchema.model_validate(asdict(i)) for i in invoices_list]
 
 
 @invoices_router.get(
@@ -30,9 +37,11 @@ async def get_invoices():
     description="This endpoint returns a single invoice",
     response_model=InvoiceOutputSchema,
 )
-async def get_invoice(invoice_id: UUID):
-    invoice = InvoicesService().fetch_invoice_by_id(invoice_id)
-    return invoice
+async def get_invoice(
+    invoice_id: UUID, db: AsyncSession = Depends(get_db)
+) -> InvoiceOutputSchema:
+    invoice = await InvoicesService().fetch_invoice_by_id(invoice_id=invoice_id, db=db)
+    return InvoiceOutputSchema.model_validate(asdict(invoice))
 
 
 @invoices_router.post(
@@ -41,10 +50,13 @@ async def get_invoice(invoice_id: UUID):
     description="This endpoint creates a new invoice",
     response_model=InvoiceOutputSchema,
 )
-async def create_invoice(request: InvoiceInputSchema):
-    invoice_service = InvoicesService()
-    invoice = invoice_service.create_invoice(request)
-    return invoice
+async def create_invoice(
+    request: InvoiceInputSchema, db: AsyncSession = Depends(get_db)
+) -> InvoiceOutputSchema:
+    invoice = await InvoicesService().create_invoice(request=request, db=db)
+    if invoice is None:
+        raise BadRequestError(detail="Failed to create invoice", status_code=500)
+    return InvoiceOutputSchema.model_validate(asdict(invoice))
 
 
 @invoices_router.put(
@@ -53,20 +65,23 @@ async def create_invoice(request: InvoiceInputSchema):
     description="This endpoint updates a single invoice and associated items",
     response_model=InvoiceOutputSchema,
 )
-async def update_invoice(invoice_id: UUID, request: InvoiceUpdateSchema):
-    invoice_service = InvoicesService()
-    updated_invoice = invoice_service.update_invoice(
-        invoice_id=invoice_id, request=request
+async def update_invoice(
+    invoice_id: UUID, request: InvoiceUpdateSchema, db: AsyncSession = Depends(get_db)
+) -> InvoiceOutputSchema:
+    updated_invoice = await InvoicesService().update_invoice(
+        invoice_id=invoice_id, request=request, db=db
     )
-    return updated_invoice
+    if updated_invoice is None:
+        raise BadRequestError(detail="Failed to update invoice", status_code=500)
+    return InvoiceOutputSchema.model_validate(asdict(updated_invoice))
 
 
 @invoices_router.delete(
     path="/invoices/{invoice_id}",
     summary="invoices endpoint",
     description="This endpoint deletes a single invoice",
+    response_model=bool,
 )
-async def delete_invoice(invoice_id: UUID):
-    invoice_service = InvoicesService()
-    resp = invoice_service.delete_invoice(invoice_id=invoice_id)
+async def delete_invoice(invoice_id: UUID, db: AsyncSession = Depends(get_db)) -> bool:
+    resp = await InvoicesService().delete_invoice(invoice_id=invoice_id, db=db)
     return resp

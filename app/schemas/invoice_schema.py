@@ -1,8 +1,10 @@
-from uuid import UUID
-from pydantic import BaseModel, Field
-from typing import Optional, List
 from datetime import date
-from app.common.enums import StatusEnum, PaymentTermsEnum
+from typing import List, Optional
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
+from app.common.enums import PaymentTermsEnum, StatusEnum
 from app.schemas.item_schema import ItemInputSchema
 
 
@@ -24,7 +26,8 @@ class InvoiceInputSchema(BaseModel):
     description: str = Field(...)
     total: Optional[float] = Field(gt=0, default=None)
     items: List[ItemInputSchema]
-    # Keeping due_date and total as optional as their value will be calculated by BE itself
+    # Keeping due_date and total as optional as
+    # their value will be calculated by BE itself
 
 
 class InvoiceOutputSchema(InvoiceInputSchema):

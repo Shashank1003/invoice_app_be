@@ -1,18 +1,20 @@
-# 🧾 Invoice App - FastAPI
+# 🧾 Invoice App - FastAPI (v2.0)
 
-A simple and efficient invoice management system built with **FastAPI**. This application provides RESTful APIs to create, retrieve, update, and delete invoices and items.
+A modern, async-first invoice management system built with **FastAPI**, **PostgreSQL**, and **SQLAlchemy**. This application provides RESTful APIs to create, retrieve, update, and delete invoices and items.
 
 ---
 
 ## 🚀 Features
 
-- 📄 Create, Read, Update, Delete (CRUD) operations for invoices
-- 📦 JSON-based API responses
-- 🛡️ FastAPI validation with Pydantic
-- 📚 Interactive Swagger UI & Redoc documentation
-- 🐘 PostgreSQL database integration (via SQLAlchemy)
-- 📦 Docker support
-- 🔐 JWT-based authentication (optional) : TODO
+- ✅ Fully Async backend with AsyncSession for non-blocking performance
+- ⚛️ Dependency injection for cleaner session management
+- ♻️ Modular, layered architecture using Entities, Services, Schemas, and Controllers
+- 🔁 RESTful CRUD APIs for Invoices and Items
+- ⚡ Robust validation via Pydantic
+- 🌐 Interactive Swagger & Redoc documentation
+- 🛠️ Docker & PostgreSQL integration
+- 🔒 JWT-based auth (TODO)
+- ✈️ Dev tooling with pre-commit, mypy, black, isort, flake8
 
 ---
 
@@ -20,6 +22,7 @@ A simple and efficient invoice management system built with **FastAPI**. This ap
 
 - 🐳 [Docker](https://docs.docker.com/get-docker/) installed
 - 📦 [Docker Compose](https://docs.docker.com/compose/install/) installed
+- 🐍 Python 3.11+
 
 ---
 
@@ -79,7 +82,7 @@ A simple and efficient invoice management system built with **FastAPI**. This ap
     - Start PostgreSQL database container.
     - Run the app on `http://localhost:8000`.
 
-8.  **Run migrations on Docker**
+8.  **Run migrations inside Docker**
 
     ```bash
     docker exec -it invoice_web sh -c "alembic upgrade head"
@@ -87,7 +90,7 @@ A simple and efficient invoice management system built with **FastAPI**. This ap
 
 9.  **Access the app**
 
-    - API root : `http://localhost:8000/api/v1`
+    - API root : `http://localhost:8000/api/v2`
     - Swagger UI docs: `http://localhost:8000/docs/openapi`
     - Redoc UI docs: `http://localhost:8000/docs/redoc`
     - Swagger UI JSON: `http://localhost:8000/docs/openapi.json`
@@ -103,6 +106,38 @@ A simple and efficient invoice management system built with **FastAPI**. This ap
     - Ensure port `5432` and `8000` are free on your machine.
     - Modify `.env` as per your environment (refer to `env.EXAMPLE`).
     - For production deployment, update database hostname and credentials accordingly.
+
+---
+
+## 📖 Dev Experience Boosts
+
+- 👩‍💼 Async + Dependency Injection
+
+  - All DB operations use async def with AsyncSession
+  - Safe session lifecycle with Depends(get_db)
+
+- 🔎 Type Hints + Static Analysis
+
+  - Strong typing via Pydantic, Literal, UUID, etc.
+  - mypy ensures type safety across the codebase
+
+- ↻ Pre-commit Hook Configuration
+
+  - `.pre-commit-config.yaml` includes:
+  - `black`
+  - `isort`
+  - `mypy`
+  - `flake8` (with bugbear)
+
+  - Manually run with:
+    ```bash
+    pre-commit run --all-files
+    ```
+
+- 👋 Friendly Errors & Log
+  - Centralized BadRequestError and ServerError
+  - Custom exception wrapper decorators
+  - SQL query logging using sqlalchemy.engine
 
 ---
 
@@ -130,8 +165,29 @@ A simple and efficient invoice management system built with **FastAPI**. This ap
 
 ---
 
+## 🧹 Tech Stack
+
+- 🐍 Backend: FastAPI, SQLAlchemy (async), Alembic
+- 🐃 Database: PostgreSQL
+- 🚧 Containerization: Docker, Docker Compose
+- 🔧 Dev Tools: Black, isort, mypy, flake8, pre-commit
+
+---
+
+## 📊 Future Improvements (TODO)
+
+- JWT Auth
+- Pagination & Filtering
+- User Roles
+- CI/CD Integration
+- Unit & Integration Tests
+
+---
+
 ## 👨‍💻 Author
 
 Shashank Gupta – @Shashank1003 | <guptashashank8975@gmail.com>
 
 ---
+
+> ✨ Built with passion and async love!
