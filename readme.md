@@ -111,36 +111,33 @@ A modern, async-first invoice management system built with **FastAPI**, **Postgr
 
 ## 📖 Dev Experience Boosts
 
-### 👩‍💼 Async + Dependency Injection
+- 👩‍💼 Async + Dependency Injection
 
-    - All DB operations use async def with AsyncSession
-    - Safe session lifecycle with Depends(get_db)
+  - All DB operations use async def with AsyncSession
+  - Safe session lifecycle with Depends(get_db)
 
-### 🔎 Type Hints + Static Analysis
+- 🔎 Type Hints + Static Analysis
 
-    - Strong typing via Pydantic, Literal, UUID, etc.
-    - mypy ensures type safety across the codebase
+  - Strong typing via Pydantic, Literal, UUID, etc.
+  - mypy ensures type safety across the codebase
 
-### ↻ Pre-commit Hook Configuration
+- ↻ Pre-commit Hook Configuration
 
-    .pre-commit-config.yaml includes:
+  - `.pre-commit-config.yaml` includes:
+  - `black`
+  - `isort`
+  - `mypy`
+  - `flake8` (with bugbear)
 
-    - black
-    - isort
-    - mypy
-    - flake8 (with bugbear)
-
-    Manually run with:
-
+  - Manually run with:
     ```bash
     pre-commit run --all-files
     ```
 
-### 👋 Friendly Errors & Log
-
-    - Centralized BadRequestError and ServerError
-    - Custom exception wrapper decorators
-    - SQL query logging using sqlalchemy.engine
+- 👋 Friendly Errors & Log
+  - Centralized BadRequestError and ServerError
+  - Custom exception wrapper decorators
+  - SQL query logging using sqlalchemy.engine
 
 ---
 
@@ -192,3 +189,5 @@ A modern, async-first invoice management system built with **FastAPI**, **Postgr
 Shashank Gupta – @Shashank1003 | <guptashashank8975@gmail.com>
 
 ---
+
+> ✨ Built with passion and async love!
