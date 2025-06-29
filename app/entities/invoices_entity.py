@@ -88,7 +88,7 @@ class InvoiceEntity:
         items_list = []
         for item in items:
             created_item = await ItemsQuery.create_invoice_item(
-                **item.dict(), invoice_id=invoice_id, db=db
+                **item.model_dump(), invoice_id=invoice_id, db=db
             )
             if created_item:
                 items_list.append(ItemsEntity(**created_item._mapping))
@@ -105,6 +105,13 @@ class InvoiceEntity:
         if invoice:
             return cls(**invoice._mapping)
         raise ServerError()
+
+    @classmethod
+    async def get_invoice_items(
+        cls, db: AsyncSession, invoice_id: UUID
+    ) -> List[ItemsEntity]:
+        items = await ItemsQuery.fetch_invoice_items(invoice_id=invoice_id, db=db)
+        return [ItemsEntity(**item._mapping) for item in items]
 
     @classmethod
     async def delete_invoice_items(cls, invoice_id: UUID, db: AsyncSession) -> bool:

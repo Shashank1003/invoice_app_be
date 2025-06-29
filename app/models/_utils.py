@@ -6,15 +6,17 @@ Model Inheritance
 
 from typing import Any, Dict, List, Self
 
-from sqlalchemy import Boolean, Column, DateTime, func, true
+from sqlalchemy import Boolean, Column, DateTime, delete, func, true
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # from app.adapters.database import Base, db_session
-from sqlalchemy.orm import DeclarativeBase, class_mapper
+from sqlalchemy.orm import class_mapper
 
+from app.adapters.database.core import Base
 
-class Base(DeclarativeBase):
-    pass
+# Base is already created with DeclarativeBase in adapters.database
+# class Base(DeclarativeBase):
+#     pass
 
 
 class ResourceMixin(Base):
@@ -89,4 +91,18 @@ class ResourceMixin(Base):
         await db.run_sync(
             lambda sync_db: sync_db.bulk_update_mappings(mapper, bulk_data)
         )
+        return
+
+    @classmethod
+    async def delete_bulk(
+        cls, db: AsyncSession, bulk_data: List[Dict[str, Any]]
+    ) -> None:
+        if not bulk_data:
+            return
+
+        ids = [item["id"] for item in bulk_data if "id" in item]
+        if not ids:
+            return
+
+        await db.execute(delete(cls).where(cls.id.in_(ids)))
         return

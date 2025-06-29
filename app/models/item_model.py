@@ -2,12 +2,11 @@ from sqlalchemy import Column, Float, ForeignKey, Integer, String, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from app.adapters.database.core import Base
-
 from ._utils import ResourceMixin
 
 
-class Item(ResourceMixin, Base):
+class Item(ResourceMixin):  # you can skip (ResourceMixin, Base) and do (ResourceMixin)
+    # as Base is already passed in ResourceMixin
     __tablename__ = "items"
 
     id = Column(

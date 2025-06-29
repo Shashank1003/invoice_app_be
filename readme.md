@@ -135,6 +135,7 @@ A modern, async-first invoice management system built with **FastAPI**, **Postgr
     ```
 
 - 👋 Friendly Errors & Log
+
   - Centralized BadRequestError and ServerError
   - Custom exception wrapper decorators
   - SQL query logging using sqlalchemy.engine

@@ -137,3 +137,16 @@ class ItemsQuery:
             {"invoice_id": invoice_id},
         )
         return True
+
+    @staticmethod
+    async def fetch_invoice_items(db: AsyncSession, invoice_id: UUID) -> Sequence[Row]:
+        result = await db.execute(
+            text(
+                """
+            SELECT id, name, quantity, price, total FROM items
+            WHERE invoice_id=:invoice_id
+                """.strip()
+            ),
+            {"invoice_id": invoice_id},
+        )
+        return result.fetchall()

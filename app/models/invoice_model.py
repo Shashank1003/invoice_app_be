@@ -5,13 +5,12 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import Enum
 
-from app.adapters.database.core import Base
 from app.common.enums import PaymentTermsEnum, StatusEnum
 
 from ._utils import ResourceMixin
 
 
-class Invoice(ResourceMixin, Base):
+class Invoice(ResourceMixin):
     __tablename__ = "invoices"
 
     id = Column(

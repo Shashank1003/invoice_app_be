@@ -5,10 +5,10 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from app.common.enums import PaymentTermsEnum, StatusEnum
-from app.schemas.item_schema import ItemInputSchema
+from app.schemas.item_schema import ItemInputSchema, ItemOutputSchema, ItemUpdateSchema
 
 
-class InvoiceInputSchema(BaseModel):
+class InvoiceSchema(BaseModel):
     due_date: Optional[date] = None
     client_name: str = Field(..., max_length=100)
     client_email: str = Field(..., max_length=100)
@@ -25,13 +25,18 @@ class InvoiceInputSchema(BaseModel):
     payment_terms: PaymentTermsEnum
     description: str = Field(...)
     total: Optional[float] = Field(gt=0, default=None)
-    items: List[ItemInputSchema]
+    # items: List[ItemInputSchema]
     # Keeping due_date and total as optional as
     # their value will be calculated by BE itself
 
 
-class InvoiceOutputSchema(InvoiceInputSchema):
+class InvoiceInputSchema(InvoiceSchema):
+    items: List[ItemInputSchema]
+
+
+class InvoiceOutputSchema(InvoiceSchema):
     id: UUID = Field(..., description="identifier for item")
+    items: List[ItemOutputSchema]
 
 
 class InvoiceListSchema(BaseModel):
@@ -42,7 +47,6 @@ class InvoiceListSchema(BaseModel):
     status: StatusEnum
 
 
-class InvoiceUpdateSchema(InvoiceInputSchema):
-    id: Optional[UUID] = Field(
-        default=None, description="identifier for invoice (not required!)"
-    )
+class InvoiceUpdateSchema(InvoiceSchema):
+    id: UUID = Field(..., description="identifier for invoice")
+    items: List[ItemUpdateSchema]
